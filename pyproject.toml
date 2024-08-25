@@ -1,0 +1,26 @@
+[project]
+name = "requests-engine"
+version = "0.1.0"
+description = "Add your description here"
+authors = [
+    { name = "EdoardoLuciani", email = "edoardo.luciani@gmail.com" }
+]
+dependencies = []
+readme = "README.md"
+requires-python = ">= 3.8"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.rye]
+managed = true
+dev-dependencies = [
+    "pytest"
+]
+
+[tool.hatch.metadata]
+allow-direct-references = true
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/requests_engine"]
