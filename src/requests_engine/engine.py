@@ -18,7 +18,6 @@ class Engine:
     ) -> list:
         semaphore = asyncio.Semaphore(32)
         async with aiohttp.ClientSession() as session:
-
             async def task(message):
                 async with semaphore:
                     return await self._get_or_generate_inference(
@@ -79,7 +78,7 @@ class Engine:
             print(f"Exception occurred: {e}")
             return None
 
-    def print_inference_cost_from_responses(self, responses: list) -> None:
+    def get_inference_cost_from_responses(self, responses: list) -> None:
         costs = self.provider.get_1k_token_input_output_cost()
 
         input_tokens = map(lambda x: x["usage"]["input_tokens"], responses)
@@ -90,9 +89,13 @@ class Engine:
         output_tokens = functools.reduce(lambda a, b: a + b, output_tokens)
         output_tokens_cost = output_tokens / 1000 * costs["output"]
 
-        print(f"Input tokens: {input_tokens}, cost: {input_tokens_cost}")
-        print(f"Output tokens: {output_tokens}, cost: {output_tokens_cost}")
-        print(f"Total cost: {input_tokens_cost + output_tokens_cost}")
+        return {
+            "input_tokens": input_tokens,
+            "input_tokens_cost": input_tokens_cost,
+            "output_tokens": output_tokens,
+            "output_tokens_cost": output_tokens_cost,
+            "total_cost": input_tokens_cost + output_tokens_cost
+        }
 
 
 def _save_object_with_hashed_name(file_path, output) -> None:
