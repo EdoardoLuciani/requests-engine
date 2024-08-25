@@ -60,3 +60,5 @@ class AwsProvider:
                 "input": 0.00025,
                 "output": 0.00125,
             }
+        else:
+            raise ValueError(f"Unsupported model_id: {self.model_id}") 
