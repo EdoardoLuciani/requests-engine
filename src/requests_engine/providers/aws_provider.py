@@ -1,6 +1,5 @@
-import json
-import botocore
-import aiohttp
+import json, botocore, aiohttp, os
+
 from requests_engine.conversation import Conversation
 import botocore.session
 from botocore.awsrequest import AWSRequest
@@ -9,16 +8,12 @@ from botocore.auth import SigV4Auth
 class AwsProvider:
     def __init__(
         self,
-        credential_file_path: str,
         model_id: str = "anthropic.claude-3-haiku-20240307-v1:0",
         region: str = "us-west-2",
     ):
         self.session = botocore.session.get_session()
 
-        with open(credential_file_path) as file:
-            contents = json.load(file)
-            self.session.set_credentials(contents["key"], contents["secret"])
-
+        self.session.set_credentials(os.environ['AWS_ACCESS_KEY'], os.environ['AWS_SECRET_KEY'])
         self.model_id = model_id
         self.region = region
 
