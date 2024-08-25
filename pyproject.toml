@@ -16,7 +16,10 @@ build-backend = "hatchling.build"
 [tool.rye]
 managed = true
 dev-dependencies = [
-    "pytest"
+    "pytest",
+    "python-dotenv",
+    "aiohttp",
+    "botocore"
 ]
 
 [tool.hatch.metadata]
