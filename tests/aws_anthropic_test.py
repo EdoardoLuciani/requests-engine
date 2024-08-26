@@ -6,6 +6,10 @@ from dotenv import load_dotenv
 def load_env():
     load_dotenv()
 
+@pytest.fixture(autouse=True)
+def clean_cache():
+    shutil.rmtree('cache/aws_tests_cache', ignore_errors=True)
+
 
 @pytest.fixture()
 def system_prompt():
@@ -19,8 +23,6 @@ def messages():
 
 
 def test_aws_batch_request(system_prompt: str, messages: list[requests_engine.Conversation]):
-    shutil.rmtree('cache/aws_tests_cache', ignore_errors=True)
-
     prov = requests_engine.AwsProvider()
     endpoint = requests_engine.Engine(prov)
 
@@ -41,3 +43,22 @@ def test_aws_batch_request(system_prompt: str, messages: list[requests_engine.Co
             pickle_data[filename] = pickle.load(f)
 
     unittest.TestCase().assertCountEqual(first=list(pickle_data.values()), second=responses)
+
+
+def test_aws_batch_request_with_cached_response(system_prompt: str, messages: list[requests_engine.Conversation], capsys: pytest.CaptureFixture):
+    prov = requests_engine.AwsProvider()
+    endpoint = requests_engine.Engine(prov)
+
+    # Run once to populate the responses
+    asyncio.run(endpoint.schedule_completions(
+        system_prompt, messages, 0.4, "aws_tests_cache"
+    ))
+
+    assert "Retrieving completion from cache file cache/aws_tests_cache/" not in capsys.readouterr().out
+
+    # Run again to read from cache
+    responses = asyncio.run(endpoint.schedule_completions(
+        system_prompt, messages, 0.4, "aws_tests_cache"
+    ))
+
+    assert "Retrieving completion from cache file cache/aws_tests_cache/" in capsys.readouterr().out
