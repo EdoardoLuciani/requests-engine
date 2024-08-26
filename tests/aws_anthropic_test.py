@@ -1,4 +1,4 @@
-import pytest, requests_engine, asyncio
+import pytest, requests_engine, asyncio, shutil, pickle, os, unittest
 from dotenv import load_dotenv
 
 
@@ -9,16 +9,18 @@ def load_env():
 
 @pytest.fixture()
 def system_prompt():
-    return "Answer the following questions accurately like a personal assistant"
+    return "Act like a personal assistant"
 
 
 @pytest.fixture()
 def messages():
-    bodies = ['How big is the sun? Respond with max 1 sentence.', 'How big is the moon? Respond with max 1 sentence.']
+    bodies = ['Give a number between 1 and 10', 'Give a number between 10 and 20']
     return [requests_engine.Conversation.with_initial_message("user", body) for body in bodies]
 
 
 def test_aws_batch_request(system_prompt: str, messages: list[requests_engine.Conversation]):
+    shutil.rmtree('cache/aws_tests_cache', ignore_errors=True)
+
     prov = requests_engine.AwsProvider()
     endpoint = requests_engine.Engine(prov)
 
@@ -26,4 +28,16 @@ def test_aws_batch_request(system_prompt: str, messages: list[requests_engine.Co
         system_prompt, messages, 0.4, "aws_tests_cache"
     ))
 
-    requests_engine.print_inference_cost_from_responses(responses)
+    assert len(responses) == len(messages)
+    assert all(responses) == True
+
+    stats = endpoint.get_inference_cost_from_responses(responses)
+    assert all(stats) == True
+
+    pickle_data = {}
+    for filename in os.listdir('cache/aws_tests_cache'):
+        file_path = os.path.join('cache/aws_tests_cache', filename)
+        with open(file_path, 'rb') as f:
+            pickle_data[filename] = pickle.load(f)
+
+    unittest.TestCase().assertCountEqual(first=list(pickle_data.values()), second=responses)
