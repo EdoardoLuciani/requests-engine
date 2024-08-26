@@ -35,7 +35,7 @@ class AwsProvider(AbstractProvider):
             }
         )
 
-    def get_inference_request(self, aiohttp_session: aiohttp.ClientSession, request_body: str) -> aiohttp.ClientResponse:
+    def _get_completion_request(self, aiohttp_session: aiohttp.ClientSession, request_body: str) -> aiohttp.ClientResponse:
         # Creating an AWSRequest object for a POST request with the service specified endpoint, JSON request body, and HTTP headers
         # https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/bedrock-runtime/client/invoke_model.html
         # https://docs.anthropic.com/claude/reference/messages_post
@@ -61,7 +61,7 @@ class AwsProvider(AbstractProvider):
             ssl=self.ssl_context,
         )
 
-    def get_responses_input_output_tokens(self, responses: list) -> Tuple[int, int]:
+    def _get_input_output_tokens_from_completions(self, responses: list) -> Tuple[int, int]:
         return (
             sum(response["usage"]["input_tokens"] for response in responses),
             sum(response["usage"]["output_tokens"] for response in responses)

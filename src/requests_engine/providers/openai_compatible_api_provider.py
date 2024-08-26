@@ -23,7 +23,7 @@ class OpenAICompatibleApiProvider(AbstractProvider):
             }
         )
 
-    def get_inference_request(
+    def _get_completion_request(
         self, aiohttp_session: aiohttp.ClientSession, request_body: str
     ) -> aiohttp.ClientResponse:
         # https://platform.openai.com/docs/api-reference/chat/create
@@ -37,7 +37,7 @@ class OpenAICompatibleApiProvider(AbstractProvider):
         )
     
 
-    def get_responses_input_output_tokens(self, responses: list) -> Tuple[int, int]:
+    def _get_input_output_tokens_from_completions(self, responses: list) -> Tuple[int, int]:
         return (
             sum(response["usage"]["prompt_tokens"] for response in responses),
             sum(response["usage"]["completion_tokens"] for response in responses)

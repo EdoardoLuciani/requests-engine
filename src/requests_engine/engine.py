@@ -17,13 +17,13 @@ class Engine:
 
             async def task(message):
                 async with semaphore:
-                    return await self._get_or_generate_inference(
+                    return await self._get_or_generate_completion(
                         session, system_prompt, message, temperature, task_name
                     )
 
             return await asyncio.gather(*(task(message) for message in messages))
 
-    async def _get_or_generate_inference(
+    async def _get_or_generate_completion(
         self,
         session: aiohttp.ClientSession,
         system_message: str,
@@ -45,24 +45,24 @@ class Engine:
                 print(f"Retrieving completion from cache file {file_path}")
                 return pickle.load(infile)
         else:
-            output = await self._generate_inference(session, request_body)
+            output = await self._generate_completion(session, request_body)
             _save_object_with_hashed_name(file_path, output)
             print(f"Completion has been saved as {file_path}")
             return output
 
-    async def _generate_inference(
+    async def _generate_completion(
         self, session: aiohttp.ClientSession, request_body: str
     ):
         try:
             print(f"Sending request to provider {self.provider.__class__.__name__}")
-            async with self.provider.get_inference_request(
+            async with self.provider._get_completion_request(
                 session, request_body
             ) as response:
                 if response.status == 200:
                     return await response.json()
                 elif response.status == 429:
                     await asyncio.sleep(5)
-                    return await self._generate_inference(session, request_body)
+                    return await self._generate_completion(session, request_body)
                 else:
                     print(f"Error: {response}")
                     return None

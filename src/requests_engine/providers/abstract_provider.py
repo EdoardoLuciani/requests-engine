@@ -14,24 +14,24 @@ class BatchInferenceCost(TypedDict):
 
 
 class AbstractProvider(ABC):
+    def get_model_id(self) -> str:
+        return self.model_id   
+
     @abstractmethod
     def get_request_body(self, system_message: str, conversation: Conversation, temperature: float) -> str:
         pass
 
     @abstractmethod
-    def get_inference_request(self, aiohttp_session: aiohttp.ClientSession, request_body: str) -> aiohttp.ClientResponse:
+    def _get_completion_request(self, aiohttp_session: aiohttp.ClientSession, request_body: str) -> aiohttp.ClientResponse:
         pass
 
     @abstractmethod
-    def get_responses_input_output_tokens(self, responses: list) -> Tuple[int, int]:
-        pass
+    def _get_input_output_tokens_from_completions(self, responses: list) -> Tuple[int, int]:
+        pass 
 
-    def get_model_id(self) -> str:
-        return self.model_id    
-
-    def get_batch_request_cost(self, responses: list) -> BatchInferenceCost:
-        (input_tokens, output_tokens) = self.get_responses_input_output_tokens(responses)
-        cost = ModelPricing.calculate_cost(self.get_model_id(), input_tokens, output_tokens)
+    def get_cost_from_completions(self, responses: list) -> BatchInferenceCost:
+        (input_tokens, output_tokens) = self._get_input_output_tokens_from_completions(responses)
+        cost = ModelPricing.get_cost_from_tokens_count(self.get_model_id(), input_tokens, output_tokens)
         return {
             "input_tokens": input_tokens,
             "output_tokens": output_tokens,
