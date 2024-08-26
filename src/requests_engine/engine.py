@@ -5,7 +5,7 @@ from .conversation import Conversation
 
 
 class Engine:
-    def __init__(self, provider: AbstractProvider, serialization_path: str = 'cache'):
+    def __init__(self, provider: AbstractProvider, serialization_path: str = "cache"):
         self.serialization_path = serialization_path
         self.provider = provider
 
