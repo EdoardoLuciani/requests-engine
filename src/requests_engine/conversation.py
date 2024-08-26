@@ -1,14 +1,24 @@
+from typing import TypedDict
+
+class MessageContent(TypedDict):
+    type: str
+    text: str
+
+class Message(TypedDict):
+    role: str
+    content: list[MessageContent]
+
 class Conversation:
     def __init__(self):
-        self.messages = []
+        self.messages: list[Message] = []
 
     @classmethod
-    def with_initial_message(cls, role, context):
+    def with_initial_message(cls, role: str, content: str) -> 'Conversation':
         instance = cls()
-        instance.add_message(role, context)
+        instance.add_message(role, content)
         return instance
 
-    def add_message(self, role, content):
+    def add_message(self, role: str, content: str):
         self.messages.append(
             {
                 "role": role,
