@@ -1,6 +1,5 @@
-from requests_engine.engine import Engine
-from requests_engine.conversation import Conversation
-from requests_engine.model_batch_inference_cost import ModelBatchInferenceCost
+from .engine import Engine
+from .conversation import Conversation
+from .model_batch_inference_cost import ModelBatchInferenceCost
 
-from requests_engine.providers.aws_provider import AwsProvider
-from requests_engine.providers.openai_compatible_api_provider import OpenAICompatibleApiProvider
+from . import providers
