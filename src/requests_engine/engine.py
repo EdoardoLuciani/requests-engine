@@ -78,7 +78,7 @@ class Engine:
             print(f"Exception occurred: {e}")
             return None
 
-    def get_inference_cost_from_responses(self, responses: list) -> None:
+    def get_inference_cost_from_responses(self, responses: list) -> dict:
         costs = self.provider.get_1k_token_input_output_cost()
 
         input_tokens = map(lambda x: x["usage"]["input_tokens"], responses)
