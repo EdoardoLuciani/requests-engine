@@ -5,6 +5,7 @@ import botocore.session
 from botocore.awsrequest import AWSRequest
 from botocore.auth import SigV4Auth
 
+
 class AwsProvider:
     def __init__(
         self,
@@ -12,13 +13,17 @@ class AwsProvider:
         region: str = "us-west-2",
     ):
         self.session = botocore.session.get_session()
-        self.session.set_credentials(os.environ['AWS_ACCESS_KEY'], os.environ['AWS_SECRET_KEY'])
+        self.session.set_credentials(
+            os.environ["AWS_ACCESS_KEY"], os.environ["AWS_SECRET_KEY"]
+        )
         self.ssl_context = ssl.create_default_context(ssl.Purpose.SERVER_AUTH)
 
         self.model_id = model_id
         self.region = region
 
-    def get_request_body(self, system_message: str, messages: Conversation, temperature: float) -> str:
+    def get_request_body(
+        self, system_message: str, messages: Conversation, temperature: float
+    ) -> str:
         return json.dumps(
             {
                 "anthropic_version": "bedrock-2023-05-31",
@@ -53,7 +58,10 @@ class AwsProvider:
         print("Sending POST request to AWS Bedrock endpoint")
 
         return aiohttp_session.post(
-            prepped.url, data=request_body, headers=prepped.headers, ssl=self.ssl_context
+            prepped.url,
+            data=request_body,
+            headers=prepped.headers,
+            ssl=self.ssl_context,
         )
 
     def get_1k_token_input_output_cost(self) -> dict:
@@ -63,4 +71,4 @@ class AwsProvider:
                 "output": 0.00125,
             }
         else:
-            raise ValueError(f"Unsupported model_id: {self.model_id}") 
+            raise ValueError(f"Unsupported model_id: {self.model_id}")

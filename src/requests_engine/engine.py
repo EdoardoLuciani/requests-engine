@@ -18,6 +18,7 @@ class Engine:
     ) -> list:
         semaphore = asyncio.Semaphore(32)
         async with aiohttp.ClientSession() as session:
+
             async def task(message):
                 async with semaphore:
                     return await self._get_or_generate_inference(
@@ -34,7 +35,6 @@ class Engine:
         temperature: float,
         task_name: str,
     ):
-
         request_body = self.provider.get_request_body(
             system_message, messages, temperature
         )
@@ -94,7 +94,7 @@ class Engine:
             "input_tokens_cost": input_tokens_cost,
             "output_tokens": output_tokens,
             "output_tokens_cost": output_tokens_cost,
-            "total_cost": input_tokens_cost + output_tokens_cost
+            "total_cost": input_tokens_cost + output_tokens_cost,
         }
 
 
