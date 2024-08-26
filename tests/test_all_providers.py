@@ -65,7 +65,7 @@ def assert_generation_and_response_caching(engine: requests_engine.Engine, syste
         engine.schedule_completions(system_prompt, messages, 0.4, engine.provider.__class__.__name__)
     )
     common_assert(engine, messages, responses)
-    assert (f"Retrieving completion from cache file {job_cache_dir}" not in capsys.readouterr().out), "Generation was retrieved from cache, when it should have not"
+    assert f"Retrieving completion from cache file {job_cache_dir}" not in capsys.readouterr().out, "Generation was retrieved from cache, when it should have not"
 
     stats = engine.provider.get_batch_request_cost(responses)
     assert all(stats) == True
@@ -74,7 +74,7 @@ def assert_generation_and_response_caching(engine: requests_engine.Engine, syste
         engine.schedule_completions(system_prompt, messages, 0.4, engine.provider.__class__.__name__)
     )
     common_assert(engine, messages, responses)
-    assert (f"Retrieving completion from cache file {job_cache_dir}" in capsys.readouterr().out, "Generation was not retrieved from cache")
+    assert f"Retrieving completion from cache file {job_cache_dir}" in capsys.readouterr().out, "Generation was not retrieved from cache"
 
 
 @pytest.mark.parametrize("provider_name", ['aws_provider', 'openai_api_groq_provider', 'openai_api_official_provider'])
