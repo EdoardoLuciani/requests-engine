@@ -39,7 +39,7 @@ def test_aws_batch_request(
     assert len(responses) == len(messages)
     assert all(responses) == True
 
-    stats = endpoint.get_inference_cost_from_responses(responses)
+    stats = prov.get_batch_inference_cost(responses)
     assert all(stats) == True
 
     pickle_data = {}
