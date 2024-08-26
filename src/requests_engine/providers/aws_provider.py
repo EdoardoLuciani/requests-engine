@@ -1,6 +1,8 @@
 import json, botocore, aiohttp, os, ssl
 
 from requests_engine.conversation import Conversation
+from requests_engine.model_batch_inference_cost import ModelBatchInferenceCost
+
 import botocore.session
 from botocore.awsrequest import AWSRequest
 from botocore.auth import SigV4Auth
@@ -55,8 +57,6 @@ class AwsProvider:
         # Prepare the request by formatting it correctly
         prepped = request.prepare()
 
-        print("Sending POST request to AWS Bedrock endpoint")
-
         return aiohttp_session.post(
             prepped.url,
             data=request_body,
@@ -64,11 +64,16 @@ class AwsProvider:
             ssl=self.ssl_context,
         )
 
-    def get_1k_token_input_output_cost(self) -> dict:
+    def get_batch_inference_cost(self, responses: list) -> ModelBatchInferenceCost:        
+        cost_dict = {
+            "input_tokens": sum(response["usage"]["input_tokens"] for response in responses),
+            "output_tokens": sum(response["usage"]["output_tokens"] for response in responses),
+        }
+
         if self.model_id == "anthropic.claude-3-haiku-20240307-v1:0":
-            return {
-                "input": 0.00025,
-                "output": 0.00125,
-            }
+            cost_dict['input_tokens_cost'] = cost_dict['input_tokens'] / 1_000_000 * 0.25
+            cost_dict['output_tokens_cost'] = cost_dict['output_tokens'] / 1_000_000 * 1.25
         else:
             raise ValueError(f"Unsupported model_id: {self.model_id}")
+        
+        return cost_dict

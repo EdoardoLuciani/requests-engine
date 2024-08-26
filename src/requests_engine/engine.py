@@ -1,11 +1,7 @@
-import aiohttp
-import pickle
-import hashlib
+import aiohttp, pickle, hashlib, os, asyncio
+
 from pathlib import Path
 from requests_engine.conversation import Conversation
-import os
-import asyncio
-import functools
 
 
 class Engine:
@@ -58,6 +54,7 @@ class Engine:
         self, session: aiohttp.ClientSession, request_body: str
     ):
         try:
+            print(f"Sending request to provider {self.provider.__class__.__name__}")
             async with self.provider.get_inference_request(
                 session, request_body
             ) as response:
@@ -77,25 +74,6 @@ class Engine:
         except Exception as e:
             print(f"Exception occurred: {e}")
             return None
-
-    def get_inference_cost_from_responses(self, responses: list) -> dict:
-        costs = self.provider.get_1k_token_input_output_cost()
-
-        input_tokens = map(lambda x: x["usage"]["input_tokens"], responses)
-        input_tokens = functools.reduce(lambda a, b: a + b, input_tokens)
-        input_tokens_cost = input_tokens / 1000 * costs["input"]
-
-        output_tokens = map(lambda x: x["usage"]["output_tokens"], responses)
-        output_tokens = functools.reduce(lambda a, b: a + b, output_tokens)
-        output_tokens_cost = output_tokens / 1000 * costs["output"]
-
-        return {
-            "input_tokens": input_tokens,
-            "input_tokens_cost": input_tokens_cost,
-            "output_tokens": output_tokens,
-            "output_tokens_cost": output_tokens_cost,
-            "total_cost": input_tokens_cost + output_tokens_cost,
-        }
 
 
 def _save_object_with_hashed_name(file_path, output) -> None:
