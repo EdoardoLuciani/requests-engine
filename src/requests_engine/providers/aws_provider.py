@@ -24,14 +24,14 @@ class AwsProvider:
         self.region = region
 
     def get_request_body(
-        self, system_message: str, messages: Conversation, temperature: float
+        self, system_message: str, conversation: Conversation, temperature: float
     ) -> str:
         return json.dumps(
             {
                 "anthropic_version": "bedrock-2023-05-31",
                 "max_tokens": 4096,
                 "system": system_message,
-                "messages": messages.messages,
+                "messages": conversation.messages,
                 "temperature": temperature,
             }
         )
