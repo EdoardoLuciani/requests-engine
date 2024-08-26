@@ -28,17 +28,17 @@ def messages():
 
 @pytest.fixture()
 def aws_provider():
-    return requests_engine.AwsProvider()
+    return requests_engine.providers.AwsProvider()
 
 
 @pytest.fixture()
 def openai_api_groq_provider():
-    return requests_engine.OpenAICompatibleApiProvider(os.environ['GROQ_API_KEY'], "https://api.groq.com/openai/v1/chat/completions", model='gemma2-9b-it')
+    return requests_engine.providers.OpenAICompatibleApiProvider(os.environ['GROQ_API_KEY'], "https://api.groq.com/openai/v1/chat/completions", model='gemma2-9b-it')
 
 
 @pytest.fixture()
 def openai_api_official_provider():
-    return requests_engine.OpenAICompatibleApiProvider(os.environ['OPENAI_API_KEY'], "https://api.openai.com/v1/chat/completions", model='gpt-4o-mini')
+    return requests_engine.providers.OpenAICompatibleApiProvider(os.environ['OPENAI_API_KEY'], "https://api.openai.com/v1/chat/completions", model='gpt-4o-mini')
 
 
 def common_assert(engine: requests_engine.Engine, messages: list[requests_engine.Conversation], responses: list):
