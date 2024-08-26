@@ -1,11 +1,11 @@
-import aiohttp, pickle, hashlib, os, asyncio
+import aiohttp, pickle, hashlib, os, asyncio, pathlib
 
-from pathlib import Path
-from requests_engine.conversation import Conversation
+from .providers.abstract_provider import AbstractProvider
+from .conversation import Conversation
 
 
 class Engine:
-    def __init__(self, provider, serialization_path: str = 'cache'):
+    def __init__(self, provider: AbstractProvider, serialization_path: str = 'cache'):
         self.serialization_path = serialization_path
         self.provider = provider
 
@@ -37,7 +37,7 @@ class Engine:
         request_body_digest = _get_request_body_digest(request_body)
 
         file_path = f"{self.serialization_path}/{task_name}"
-        Path(file_path).mkdir(parents=True, exist_ok=True)
+        pathlib.Path(file_path).mkdir(parents=True, exist_ok=True)
         file_path += f"/{request_body_digest}.pkl"
 
         if os.path.isfile(file_path):

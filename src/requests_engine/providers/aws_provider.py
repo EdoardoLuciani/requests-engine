@@ -1,14 +1,15 @@
 import json, botocore, aiohttp, os, ssl
 
-from requests_engine.conversation import Conversation
-from requests_engine.model_batch_inference_cost import ModelBatchInferenceCost
+from .abstract_provider import AbstractProvider
+from ..conversation import Conversation
+from ..model_batch_inference_cost import ModelBatchInferenceCost
 
 import botocore.session
 from botocore.awsrequest import AWSRequest
 from botocore.auth import SigV4Auth
 
 
-class AwsProvider:
+class AwsProvider(AbstractProvider):
     def __init__(
         self,
         model_id: str = "anthropic.claude-3-haiku-20240307-v1:0",
@@ -36,9 +37,7 @@ class AwsProvider:
             }
         )
 
-    def get_inference_request(
-        self, aiohttp_session: aiohttp.ClientSession, request_body: str
-    ):
+    def get_inference_request(self, aiohttp_session: aiohttp.ClientSession, request_body: str) -> aiohttp.ClientResponse:
         # Creating an AWSRequest object for a POST request with the service specified endpoint, JSON request body, and HTTP headers
         # https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/bedrock-runtime/client/invoke_model.html
         # https://docs.anthropic.com/claude/reference/messages_post
@@ -64,7 +63,7 @@ class AwsProvider:
             ssl=self.ssl_context,
         )
 
-    def get_batch_inference_cost(self, responses: list) -> ModelBatchInferenceCost:        
+    def get_batch_inference_cost(self, responses: list) -> ModelBatchInferenceCost:
         cost_dict = {
             "input_tokens": sum(response["usage"]["input_tokens"] for response in responses),
             "output_tokens": sum(response["usage"]["output_tokens"] for response in responses),
