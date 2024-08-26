@@ -59,10 +59,7 @@ class Engine:
                 session, request_body
             ) as response:
                 if response.status == 200:
-                    output = await response.json()
-                    if output["stop_reason"] == "max_tokens":
-                        print("Max tokens in response reached")
-                    return output
+                    return await response.json()
                 elif response.status == 429:
                     await asyncio.sleep(5)
                     return await self._generate_inference(session, request_body)
