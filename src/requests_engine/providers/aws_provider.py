@@ -1,4 +1,4 @@
-import json, botocore, aiohttp, os
+import json, botocore, aiohttp, os, ssl
 
 from requests_engine.conversation import Conversation
 import botocore.session
@@ -12,8 +12,9 @@ class AwsProvider:
         region: str = "us-west-2",
     ):
         self.session = botocore.session.get_session()
-
         self.session.set_credentials(os.environ['AWS_ACCESS_KEY'], os.environ['AWS_SECRET_KEY'])
+        self.ssl_context = ssl.create_default_context(ssl.Purpose.SERVER_AUTH)
+
         self.model_id = model_id
         self.region = region
 
@@ -34,6 +35,7 @@ class AwsProvider:
         # Creating an AWSRequest object for a POST request with the service specified endpoint, JSON request body, and HTTP headers
         # https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/bedrock-runtime/client/invoke_model.html
         # https://docs.anthropic.com/claude/reference/messages_post
+        # https://docs.aws.amazon.com/bedrock/latest/APIReference/API_runtime_InvokeModel.html
         request = AWSRequest(
             method="POST",
             url=f"https://bedrock-runtime.{self.region}.amazonaws.com/model/{self.model_id}/invoke",
@@ -51,7 +53,7 @@ class AwsProvider:
         print("Sending POST request to AWS Bedrock endpoint")
 
         return aiohttp_session.post(
-            prepped.url, data=request_body, headers=prepped.headers
+            prepped.url, data=request_body, headers=prepped.headers, ssl=self.ssl_context
         )
 
     def get_1k_token_input_output_cost(self) -> dict:
