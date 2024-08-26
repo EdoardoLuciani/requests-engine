@@ -33,12 +33,12 @@ def aws_provider():
 
 @pytest.fixture()
 def openai_api_groq_provider():
-    return requests_engine.providers.OpenAICompatibleApiProvider(os.environ['GROQ_API_KEY'], "https://api.groq.com/openai/v1/chat/completions", model='gemma2-9b-it')
+    return requests_engine.providers.OpenAICompatibleApiProvider(os.environ['GROQ_API_KEY'], "https://api.groq.com/openai/v1/chat/completions", model_id='gemma2-9b-it')
 
 
 @pytest.fixture()
 def openai_api_official_provider():
-    return requests_engine.providers.OpenAICompatibleApiProvider(os.environ['OPENAI_API_KEY'], "https://api.openai.com/v1/chat/completions", model='gpt-4o-mini')
+    return requests_engine.providers.OpenAICompatibleApiProvider(os.environ['OPENAI_API_KEY'], "https://api.openai.com/v1/chat/completions", model_id='gpt-4o-mini')
 
 
 def common_assert(engine: requests_engine.Engine, messages: list[requests_engine.Conversation], responses: list):
@@ -67,7 +67,7 @@ def assert_generation_and_response_caching(engine: requests_engine.Engine, syste
     common_assert(engine, messages, responses)
     assert (f"Retrieving completion from cache file {job_cache_dir}" not in capsys.readouterr().out), "Generation was retrieved from cache, when it should have not"
 
-    stats = engine.provider.get_batch_inference_cost(responses)
+    stats = engine.provider.get_batch_request_cost(responses)
     assert all(stats) == True
 
     responses = asyncio.run(

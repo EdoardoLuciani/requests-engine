@@ -1,12 +1,10 @@
-import json, botocore, aiohttp, os, ssl
+import json, botocore, aiohttp, os, ssl,  botocore.session
+from botocore.awsrequest import AWSRequest
+from botocore.auth import SigV4Auth
+from typing import Tuple
 
 from .abstract_provider import AbstractProvider
 from ..conversation import Conversation
-from ..model_batch_inference_cost import ModelBatchInferenceCost
-
-import botocore.session
-from botocore.awsrequest import AWSRequest
-from botocore.auth import SigV4Auth
 
 
 class AwsProvider(AbstractProvider):
@@ -63,16 +61,8 @@ class AwsProvider(AbstractProvider):
             ssl=self.ssl_context,
         )
 
-    def get_batch_inference_cost(self, responses: list) -> ModelBatchInferenceCost:
-        cost_dict = {
-            "input_tokens": sum(response["usage"]["input_tokens"] for response in responses),
-            "output_tokens": sum(response["usage"]["output_tokens"] for response in responses),
-        }
-
-        if self.model_id == "anthropic.claude-3-haiku-20240307-v1:0":
-            cost_dict['input_tokens_cost'] = cost_dict['input_tokens'] / 1_000_000 * 0.25
-            cost_dict['output_tokens_cost'] = cost_dict['output_tokens'] / 1_000_000 * 1.25
-        else:
-            raise ValueError(f"Unsupported model_id: {self.model_id}")
-        
-        return cost_dict
+    def get_responses_input_output_tokens(self, responses: list) -> Tuple[int, int]:
+        return (
+            sum(response["usage"]["input_tokens"] for response in responses),
+            sum(response["usage"]["output_tokens"] for response in responses)
+        )
