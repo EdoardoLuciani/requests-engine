@@ -67,9 +67,7 @@ class Engine:
                     await asyncio.sleep(5)
                     return await self._generate_inference(session, request_body)
                 else:
-                    print(
-                        f"Error: Received status code {response.status}, Response: {response.text}"
-                    )
+                    print(f"Error: {response}")
                     return None
         except Exception as e:
             print(f"Exception occurred: {e}")
