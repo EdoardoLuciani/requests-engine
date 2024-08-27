@@ -14,7 +14,7 @@ class Message(TypedDict):
 class Conversation:
     def __init__(self):
         self.system_prompt: str = None
-        self.messages: list[Message] = []
+        self._messages: list[Message] = []
 
     @classmethod
     def with_initial_message(cls, system_prompt: str, role: str, content: str) -> "Conversation":
@@ -24,7 +24,7 @@ class Conversation:
         return instance
 
     def add_message(self, role: str, content: str):
-        self.messages.append(
+        self._messages.append(
             {
                 "role": role,
                 "content": [
@@ -39,12 +39,12 @@ class Conversation:
     def to_openai_format(self) -> list[Any]:
         messages = [{"role": "user", "content": self.system_prompt}]
         messages.extend(
-            [{"role": message["role"], "content": message["content"][0]["text"]} for message in self.messages]
+            [{"role": message["role"], "content": message["content"][0]["text"]} for message in self._messages]
         )
         return messages
 
     def to_anthropic_format(self) -> list[Any]:
-        return self.messages
+        return self._messages
 
     def __repr__(self):
-        return str(self.messages)
+        return str(self._messages)
