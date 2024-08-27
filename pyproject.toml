@@ -5,7 +5,12 @@ description = "Add your description here"
 authors = [
     { name = "EdoardoLuciani", email = "edoardo.luciani@gmail.com" }
 ]
-dependencies = []
+dependencies = [
+    "aiohttp",
+    "botocore",
+    "google-auth",
+    "requests"
+]
 readme = "README.md"
 requires-python = ">= 3.8"
 
@@ -17,11 +22,7 @@ build-backend = "hatchling.build"
 managed = true
 dev-dependencies = [
     "pytest",
-    "python-dotenv",
-    "aiohttp",
-    "botocore",
-    "google-auth",
-    "requests"
+    "python-dotenv"
 ]
 
 [tool.hatch.metadata]
