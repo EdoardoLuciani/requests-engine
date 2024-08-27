@@ -31,7 +31,9 @@ def messages():
 
 @pytest.fixture()
 def aws_provider():
-    return requests_engine.providers.AwsProvider()
+    return requests_engine.providers.AwsProvider(
+        os.environ["AWS_ACCESS_KEY"], os.environ["AWS_SECRET_KEY"]
+    )
 
 
 @pytest.fixture()

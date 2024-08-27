@@ -1,4 +1,4 @@
-import json, botocore, aiohttp, os, ssl, botocore.session
+import json, botocore, aiohttp, ssl, botocore.session
 from botocore.awsrequest import AWSRequest
 from botocore.auth import SigV4Auth
 from typing import Tuple
@@ -10,13 +10,13 @@ from ..conversation import Conversation
 class AwsProvider(AbstractProvider):
     def __init__(
         self,
+        aws_access_key: str,
+        aws_secret_key: str,
         model_id: str = "anthropic.claude-3-haiku-20240307-v1:0",
         region: str = "us-west-2",
     ):
         self.session = botocore.session.get_session()
-        self.session.set_credentials(
-            os.environ["AWS_ACCESS_KEY"], os.environ["AWS_SECRET_KEY"]
-        )
+        self.session.set_credentials(aws_access_key, aws_secret_key)
         self.ssl_context = ssl.create_default_context(ssl.Purpose.SERVER_AUTH)
 
         self.model_id = model_id
