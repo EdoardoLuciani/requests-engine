@@ -1,3 +1,4 @@
 from .aws_anthropic_provider import AwsAnthropicProvider
 from .openai_compatible_api_provider import OpenAICompatibleApiProvider
+from .gcp_beta_completions_provider import GcpBetaCompletionsProvider
 from .abstract_provider import AbstractProvider
