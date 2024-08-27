@@ -18,6 +18,10 @@ class ModelPricing:
             "input_tokens_cost": 0.25,
             "output_tokens_cost": 1.25,
         },
+        "meta/llama3-405b-instruct-maas": {
+            "input_tokens_cost": 5.32,
+            "output_tokens_cost": 16,
+        }
     }
 
     @staticmethod
