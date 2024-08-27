@@ -25,16 +25,10 @@ class ModelPricing:
         return ModelPricing._models[model]
 
     @staticmethod
-    def get_cost_from_tokens_count(
-        model: str, input_tokens: int, output_tokens: int
-    ) -> InputOutputPricing:
+    def get_cost_from_tokens_count(model: str, input_tokens: int, output_tokens: int) -> InputOutputPricing:
         model_price = ModelPricing.get_model_pricing(model)
-        input_tokens_cost = (input_tokens / 1_000_000) * model_price[
-            "input_tokens_cost"
-        ]
-        output_tokens_cost = (output_tokens / 1_000_000) * model_price[
-            "output_tokens_cost"
-        ]
+        input_tokens_cost = (input_tokens / 1_000_000) * model_price["input_tokens_cost"]
+        output_tokens_cost = (output_tokens / 1_000_000) * model_price["output_tokens_cost"]
         return {
             "input_tokens_cost": input_tokens_cost,
             "output_tokens_cost": output_tokens_cost,

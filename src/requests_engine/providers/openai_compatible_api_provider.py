@@ -12,15 +12,10 @@ class OpenAICompatibleApiProvider(AbstractProvider):
         self.model_id = model_id
         self.ssl_context = ssl.create_default_context(ssl.Purpose.SERVER_AUTH)
 
-    def get_request_body(
-        self, system_message: str, conversation: Conversation, temperature: float
-    ) -> str:
+    def get_request_body(self, system_message: str, conversation: Conversation, temperature: float) -> str:
         messages = [{"role": "system", "content": system_message}]
         messages.extend(
-            [
-                {"role": message["role"], "content": message["content"][0]["text"]}
-                for message in conversation.messages
-            ]
+            [{"role": message["role"], "content": message["content"][0]["text"]} for message in conversation.messages]
         )
 
         return json.dumps(
@@ -40,13 +35,9 @@ class OpenAICompatibleApiProvider(AbstractProvider):
             "Content-Type": "application/json",
         }
 
-        return aiohttp_session.post(
-            self.base_url, data=request_body, headers=headers, ssl=self.ssl_context
-        )
+        return aiohttp_session.post(self.base_url, data=request_body, headers=headers, ssl=self.ssl_context)
 
-    def _get_input_output_tokens_from_completions(
-        self, responses: list
-    ) -> Tuple[int, int]:
+    def _get_input_output_tokens_from_completions(self, responses: list) -> Tuple[int, int]:
         return (
             sum(response["usage"]["prompt_tokens"] for response in responses),
             sum(response["usage"]["completion_tokens"] for response in responses),

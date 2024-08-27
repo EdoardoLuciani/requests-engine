@@ -31,9 +31,7 @@ def messages():
 
 @pytest.fixture()
 def aws_provider():
-    return requests_engine.providers.AwsProvider(
-        os.environ["AWS_ACCESS_KEY"], os.environ["AWS_SECRET_KEY"]
-    )
+    return requests_engine.providers.AwsProvider(os.environ["AWS_ACCESS_KEY"], os.environ["AWS_SECRET_KEY"])
 
 
 @pytest.fixture()
@@ -70,9 +68,7 @@ def common_assert(
         with open(file_path, "rb") as f:
             pickle_data[filename] = pickle.load(f)
 
-    unittest.TestCase().assertCountEqual(
-        first=list(pickle_data.values()), second=responses
-    )
+    unittest.TestCase().assertCountEqual(first=list(pickle_data.values()), second=responses)
 
 
 def assert_generation_and_response_caching(
@@ -84,28 +80,22 @@ def assert_generation_and_response_caching(
     job_cache_dir = f"{CACHE_DIR}/{engine.provider.__class__.__name__}"
 
     responses = asyncio.run(
-        engine.schedule_completions(
-            system_prompt, messages, 0.4, engine.provider.__class__.__name__
-        )
+        engine.schedule_completions(system_prompt, messages, 0.4, engine.provider.__class__.__name__)
     )
     common_assert(engine, messages, responses)
     assert (
-        f"Retrieving completion from cache file {job_cache_dir}"
-        not in capsys.readouterr().out
+        f"Retrieving completion from cache file {job_cache_dir}" not in capsys.readouterr().out
     ), "Generation was retrieved from cache, when it should have not"
 
     stats = engine.provider.get_cost_from_completions(responses)
     assert all(stats) == True
 
     responses = asyncio.run(
-        engine.schedule_completions(
-            system_prompt, messages, 0.4, engine.provider.__class__.__name__
-        )
+        engine.schedule_completions(system_prompt, messages, 0.4, engine.provider.__class__.__name__)
     )
     common_assert(engine, messages, responses)
     assert (
-        f"Retrieving completion from cache file {job_cache_dir}"
-        in capsys.readouterr().out
+        f"Retrieving completion from cache file {job_cache_dir}" in capsys.readouterr().out
     ), "Generation was not retrieved from cache"
 
 

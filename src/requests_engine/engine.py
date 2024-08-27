@@ -31,9 +31,7 @@ class Engine:
         temperature: float,
         task_name: str,
     ):
-        request_body = self.provider.get_request_body(
-            system_message, messages, temperature
-        )
+        request_body = self.provider.get_request_body(system_message, messages, temperature)
         request_body_digest = _get_request_body_digest(request_body)
 
         file_path = f"{self.serialization_path}/{task_name}"
@@ -50,14 +48,10 @@ class Engine:
             print(f"Completion has been saved as {file_path}")
             return output
 
-    async def _generate_completion(
-        self, session: aiohttp.ClientSession, request_body: str
-    ):
+    async def _generate_completion(self, session: aiohttp.ClientSession, request_body: str):
         try:
             print(f"Sending request to provider {self.provider.__class__.__name__}")
-            async with self.provider._get_completion_request(
-                session, request_body
-            ) as response:
+            async with self.provider._get_completion_request(session, request_body) as response:
                 if response.status == 200:
                     return await response.json()
                 elif response.status == 429:

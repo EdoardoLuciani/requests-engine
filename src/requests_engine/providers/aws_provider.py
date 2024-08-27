@@ -22,9 +22,7 @@ class AwsProvider(AbstractProvider):
         self.model_id = model_id
         self.region = region
 
-    def get_request_body(
-        self, system_message: str, conversation: Conversation, temperature: float
-    ) -> str:
+    def get_request_body(self, system_message: str, conversation: Conversation, temperature: float) -> str:
         return json.dumps(
             {
                 "anthropic_version": "bedrock-2023-05-31",
@@ -63,9 +61,7 @@ class AwsProvider(AbstractProvider):
             ssl=self.ssl_context,
         )
 
-    def _get_input_output_tokens_from_completions(
-        self, responses: list
-    ) -> Tuple[int, int]:
+    def _get_input_output_tokens_from_completions(self, responses: list) -> Tuple[int, int]:
         return (
             sum(response["usage"]["input_tokens"] for response in responses),
             sum(response["usage"]["output_tokens"] for response in responses),
