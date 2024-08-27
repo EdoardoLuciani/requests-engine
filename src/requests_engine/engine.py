@@ -1,4 +1,4 @@
-import aiohttp, pickle, hashlib, os, asyncio, pathlib
+import aiohttp, pickle, hashlib, os, asyncio, pathlib, traceback
 
 from .providers.abstract_provider import AbstractProvider
 from .conversation import Conversation
@@ -61,7 +61,7 @@ class Engine:
                     print(f"Error: {response}")
                     return None
         except Exception as e:
-            print(f"Exception occurred: {e}")
+            print(f"Exception occurred: {traceback.print_exc()}")
             return None
 
 
