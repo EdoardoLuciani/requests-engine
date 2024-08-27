@@ -30,8 +30,8 @@ def messages():
 
 
 @pytest.fixture()
-def aws_provider():
-    return requests_engine.providers.AwsProvider(os.environ["AWS_ACCESS_KEY"], os.environ["AWS_SECRET_KEY"])
+def aws_anthropic_provider():
+    return requests_engine.providers.AwsAnthropicProvider(os.environ["AWS_ACCESS_KEY"], os.environ["AWS_SECRET_KEY"])
 
 
 @pytest.fixture()
@@ -101,7 +101,7 @@ def assert_generation_and_response_caching(
 
 @pytest.mark.parametrize(
     "provider_name",
-    ["aws_provider", "openai_api_groq_provider", "openai_api_official_provider"],
+    ["aws_anthropic_provider", "openai_api_groq_provider", "openai_api_official_provider"],
 )
 def test_generate_response(
     provider_name,

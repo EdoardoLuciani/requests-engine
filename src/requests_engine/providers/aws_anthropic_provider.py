@@ -7,7 +7,7 @@ from .abstract_provider import AbstractProvider
 from ..conversation import Conversation
 
 
-class AwsProvider(AbstractProvider):
+class AwsAnthropicProvider(AbstractProvider):
     def __init__(
         self,
         aws_access_key: str,
