@@ -55,7 +55,7 @@ def openai_api_official_provider():
 @pytest.fixture()
 def gcp_beta_completions_provider():
     return requests_engine.providers.GcpBetaCompletionsProvider(
-        base64.b64decode(os.environ['GCP_SERVICE_CREDENTIAL_BASE64']).decode('utf-8')
+        base64.b64decode(os.environ["GCP_SERVICE_CREDENTIAL_BASE64"]).decode("utf-8")
     )
 
 
@@ -108,7 +108,12 @@ def assert_generation_and_response_caching(
 
 @pytest.mark.parametrize(
     "provider_name",
-    ["aws_anthropic_provider", "openai_api_groq_provider", "openai_api_official_provider", "gcp_beta_completions_provider"],
+    [
+        "aws_anthropic_provider",
+        "openai_api_groq_provider",
+        "openai_api_official_provider",
+        "gcp_beta_completions_provider",
+    ],
 )
 def test_generate_response(
     provider_name,
