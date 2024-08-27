@@ -19,7 +19,9 @@ dev-dependencies = [
     "pytest",
     "python-dotenv",
     "aiohttp",
-    "botocore"
+    "botocore",
+    "google-auth",
+    "requests"
 ]
 
 [tool.hatch.metadata]
