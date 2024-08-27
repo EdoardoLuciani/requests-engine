@@ -22,13 +22,13 @@ class AwsAnthropicProvider(AbstractProvider):
         self.model_id = model_id
         self.region = region
 
-    def get_request_body(self, system_message: str, conversation: Conversation, temperature: float) -> str:
+    def get_request_body(self, conversation: Conversation, temperature: float) -> str:
         return json.dumps(
             {
                 "anthropic_version": "bedrock-2023-05-31",
                 "max_tokens": 4096,
-                "system": system_message,
-                "messages": conversation.messages,
+                "system": conversation.system_prompt,
+                "messages": conversation.to_anthropic_format(),
                 "temperature": temperature,
             }
         )

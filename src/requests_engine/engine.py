@@ -10,28 +10,27 @@ class Engine:
         self.provider = provider
 
     async def schedule_completions(
-        self, system_prompt: str, messages: list, temperature: float, task_name: str
+        self, conversations: list[Conversation], temperature: float, task_name: str
     ) -> list:
         semaphore = asyncio.Semaphore(32)
         async with aiohttp.ClientSession() as session:
 
-            async def task(message):
+            async def task(conversation):
                 async with semaphore:
                     return await self._get_or_generate_completion(
-                        session, system_prompt, message, temperature, task_name
+                        session, conversation, temperature, task_name
                     )
 
-            return await asyncio.gather(*(task(message) for message in messages))
+            return await asyncio.gather(*(task(conversation) for conversation in conversations))
 
     async def _get_or_generate_completion(
         self,
         session: aiohttp.ClientSession,
-        system_message: str,
-        messages: Conversation,
+        conversation: Conversation,
         temperature: float,
         task_name: str,
     ):
-        request_body = self.provider.get_request_body(system_message, messages, temperature)
+        request_body = self.provider.get_request_body(conversation, temperature)
         request_body_digest = _get_request_body_digest(request_body)
 
         file_path = f"{self.serialization_path}/{task_name}"

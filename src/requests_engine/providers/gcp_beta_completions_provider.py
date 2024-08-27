@@ -25,23 +25,16 @@ class GcpBetaCompletionsProvider(AbstractProvider):
         self.model_id = model_id
         self.ssl_context = ssl.create_default_context(ssl.Purpose.SERVER_AUTH)
 
-    def get_request_body(self, system_message: str, conversation: Conversation, temperature: float) -> str:
-        messages = [{"role": "user", "content": system_message}]
-        messages.extend(
-            [{"role": message["role"], "content": message["content"][0]["text"]} for message in conversation.messages]
-        )
-
-        x = json.dumps(
+    def get_request_body(self, conversation: Conversation, temperature: float) -> str:
+        return json.dumps(
             {
                 "model": self.model_id,
-                "messages": messages,
+                "messages": conversation.to_openai_format(),
                 "max_tokens": 4096,
                 "stream": False,
                 "temperature": temperature,
             }
         )
-        print(x)
-        return x
 
     def _get_token(self, aiohttp_session: aiohttp.ClientSession):
         if time.time() - self.token_last_refresh > 3000:

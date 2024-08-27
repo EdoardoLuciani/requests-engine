@@ -18,7 +18,7 @@ class AbstractProvider(ABC):
         return self.model_id
 
     @abstractmethod
-    def get_request_body(self, system_message: str, conversation: Conversation, temperature: float) -> str:
+    def get_request_body(self, conversation: Conversation, temperature: float) -> str:
         pass
 
     @abstractmethod

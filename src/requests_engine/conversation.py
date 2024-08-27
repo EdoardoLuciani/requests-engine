@@ -1,4 +1,4 @@
-from typing import TypedDict
+from typing import TypedDict, Any
 
 
 class MessageContent(TypedDict):
@@ -13,11 +13,13 @@ class Message(TypedDict):
 
 class Conversation:
     def __init__(self):
+        self.system_prompt: str = None
         self.messages: list[Message] = []
 
     @classmethod
-    def with_initial_message(cls, role: str, content: str) -> "Conversation":
+    def with_initial_message(cls, system_prompt: str, role: str, content: str) -> "Conversation":
         instance = cls()
+        instance.system_prompt = system_prompt
         instance.add_message(role, content)
         return instance
 
@@ -33,6 +35,16 @@ class Conversation:
                 ],
             }
         )
+
+    def to_openai_format(self) -> list[Any]:
+        messages = [{"role": "user", "content": self.system_prompt}]
+        messages.extend(
+            [{"role": message["role"], "content": message["content"][0]["text"]} for message in self.messages]
+        )
+        return messages
+
+    def to_anthropic_format(self) -> list[Any]:
+        return self.messages
 
     def __repr__(self):
         return str(self.messages)
