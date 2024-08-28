@@ -47,4 +47,4 @@ class Conversation:
         return self._messages
 
     def __repr__(self):
-        return str(self._messages)
+        return str(self.to_openai_format())
