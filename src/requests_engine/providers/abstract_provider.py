@@ -11,7 +11,8 @@ class BatchInferenceCost(TypedDict):
     input_tokens_cost: float
     output_tokens: int
     output_tokens_cost: float
-
+    total_tokens: int
+    total_tokens_cost: float
 
 class AbstractProvider(ABC):
     def get_model_id(self) -> str:
@@ -37,6 +38,8 @@ class AbstractProvider(ABC):
         return {
             "input_tokens": input_tokens,
             "output_tokens": output_tokens,
-            "input_tokens_cost": cost["input_tokens_cost"],
-            "output_tokens_cost": cost["output_tokens_cost"],
+            "total_tokens": input_tokens + output_tokens,
+            "input_cost": cost["input_tokens_cost"],
+            "output_cost": cost["output_tokens_cost"],
+            "total_tokens_cost": cost["input_tokens_cost"] + cost["output_tokens_cost"],
         }
