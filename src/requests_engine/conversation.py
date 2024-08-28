@@ -37,7 +37,7 @@ class Conversation:
         )
 
     def to_openai_format(self) -> list[Any]:
-        messages = [{"role": "user", "content": self.system_prompt}]
+        messages = [{"role": "system", "content": self.system_prompt}]
         messages.extend(
             [{"role": message["role"], "content": message["content"][0]["text"]} for message in self._messages]
         )
