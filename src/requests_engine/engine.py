@@ -5,14 +5,15 @@ from .conversation import Conversation
 
 
 class Engine:
-    def __init__(self, provider: AbstractProvider, serialization_path: str = "cache"):
+    def __init__(self, provider: AbstractProvider, serialization_path: str = "cache", max_inflight_requests: int = 32):
         self.serialization_path = serialization_path
         self.provider = provider
+        self.max_inflight_requests = max_inflight_requests
 
     async def schedule_completions(
         self, conversations: list[Conversation], temperature: float, task_name: str
     ) -> list:
-        semaphore = asyncio.Semaphore(32)
+        semaphore = asyncio.Semaphore(self.max_inflight_requests)
         async with aiohttp.ClientSession() as session:
 
             async def task(conversation):
