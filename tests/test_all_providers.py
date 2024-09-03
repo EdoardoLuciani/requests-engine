@@ -107,8 +107,10 @@ def common_assert(
     conversations: list[requests_engine.Conversation],
     responses: list,
 ):
-    assert len(responses) == len(conversations)
-    assert all(responses) == True
+    completions = [e[0] for e in responses]
+
+    assert len(completions) == len(conversations)
+    assert all(completions) == True
 
     job_cache_dir = f"{CACHE_DIR}/{engine.provider.__class__.__name__}"
 
@@ -118,4 +120,4 @@ def common_assert(
         with open(file_path, "rb") as f:
             pickle_data[filename] = pickle.load(f)
 
-    unittest.TestCase().assertCountEqual(first=list(pickle_data.values()), second=responses)
+    unittest.TestCase().assertCountEqual(first=list(pickle_data.values()), second=completions)

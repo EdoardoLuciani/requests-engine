@@ -33,7 +33,7 @@ class AbstractProvider(ABC):
         pass
 
     def get_cost_from_completions(self, responses: list) -> BatchInferenceCost:
-        (input_tokens, output_tokens) = self._get_input_output_tokens_from_completions(responses)
+        (input_tokens, output_tokens) = self._get_input_output_tokens_from_completions([e[0] for e in responses])
         cost = ModelPricing.get_cost_from_tokens_count(self.get_model_id(), input_tokens, output_tokens)
         return {
             "input_tokens": input_tokens,

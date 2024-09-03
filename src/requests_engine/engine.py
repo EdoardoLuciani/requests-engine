@@ -1,5 +1,6 @@
 import aiohttp, pickle, hashlib, os, asyncio, pathlib, traceback
 
+from typing import Any
 from .providers.abstract_provider import AbstractProvider
 from .conversation import Conversation
 
@@ -12,7 +13,7 @@ class Engine:
 
     async def schedule_completions(
         self, conversations: list[Conversation], temperature: float, task_name: str
-    ) -> list:
+    ) -> list[tuple[Any, str]]:
         semaphore = asyncio.Semaphore(self.max_inflight_requests)
         async with aiohttp.ClientSession() as session:
 
@@ -30,7 +31,7 @@ class Engine:
         conversation: Conversation,
         temperature: float,
         task_name: str,
-    ):
+    ) -> tuple[Any, str]:
         request_body = self.provider.get_request_body(conversation, temperature)
         request_body_digest = _get_request_body_digest(request_body)
 
@@ -41,12 +42,12 @@ class Engine:
         if os.path.isfile(file_path):
             with open(file_path, "rb") as infile:
                 print(f"Retrieving completion from cache file {file_path}")
-                return pickle.load(infile)
+                return (pickle.load(infile), request_body_digest)
         else:
             output = await self._generate_completion(session, request_body)
             _save_object_with_hashed_name(file_path, output)
             print(f"Completion has been saved as {file_path}")
-            return output
+            return (output, request_body_digest)
 
     async def _generate_completion(self, session: aiohttp.ClientSession, request_body: str):
         try:
