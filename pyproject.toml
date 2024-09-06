@@ -1,7 +1,7 @@
 [project]
 name = "requests-engine"
 version = "0.1.0"
-description = "Add your description here"
+description = "A simple library for performing LLM batch inference using API requests. "
 authors = [
     { name = "EdoardoLuciani", email = "edoardo.luciani@gmail.com" }
 ]
