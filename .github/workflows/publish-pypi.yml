@@ -1,0 +1,25 @@
+name: Publish PyPI
+on:
+  workflow_dispatch:
+
+jobs:
+  publish:
+    name: publish
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rye
+        run: |
+          curl -sSf https://rye.astral.sh/get | bash
+          echo "$HOME/.rye/shims" >> $GITHUB_PATH
+        env:
+          RYE_INSTALL_OPTION: '--yes'
+
+      - name: Publish to PyPI
+        run: |
+          rye build --clean
+          rye publish --yes --token=$PYPI_TOKEN
+        env:
+          PYPI_TOKEN: ${{ secrets.OPENAI_PYPI_TOKEN || secrets.PYPI_TOKEN }}
