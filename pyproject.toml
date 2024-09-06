@@ -13,6 +13,13 @@ dependencies = [
 ]
 readme = "README.md"
 requires-python = ">= 3.8"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License"
+]
+
+[project.urls]
+Homepage = "https://github.com/EdoardoLuciani/requests_engine"
 
 [build-system]
 requires = ["hatchling"]
