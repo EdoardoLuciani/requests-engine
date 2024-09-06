@@ -24,6 +24,9 @@ conversations = [
     for e in ['How big is the moon? ', 'How big is the sun?']
 ]
 completions = asyncio.run(engine.schedule_completions(conversations, 0.3, 'example'))
+
+print(completions)
+print(engine.get_cost_from_completions(completions))
 ```
 
 Output:
