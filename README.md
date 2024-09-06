@@ -1,5 +1,7 @@
 # requests-engine
 
+[![PyPI version](https://img.shields.io/pypi/v/openai.svg)](https://pypi.org/project/requests-engine/)
+
 requests-engine is a simple yet powerful library designed for batch LLM inference using API requests.
 Key Features:
 - Response Caching: Automatically caches responses to disk, eliminating redundant requests and reducing API calls.
