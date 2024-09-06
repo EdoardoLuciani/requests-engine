@@ -61,7 +61,7 @@ class Engine:
                 else:
                     print(f"Error: {response}")
                     return None
-        except Exception as e:
+        except Exception:
             print(f"Exception occurred: {traceback.print_exc()}")
             return None
 

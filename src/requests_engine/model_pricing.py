@@ -1,4 +1,4 @@
-from typing import Dict, Tuple, TypedDict
+from typing import Dict, TypedDict
 
 
 class InputOutputPricing(TypedDict):

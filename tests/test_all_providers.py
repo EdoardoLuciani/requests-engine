@@ -91,7 +91,7 @@ def assert_generation_and_response_caching(
     ), "Generation was retrieved from cache, when it should have not"
 
     stats = engine.provider.get_cost_from_completions(responses)
-    assert all(stats) == True
+    assert all(stats)
 
     responses = asyncio.run(
         engine.schedule_completions(conversation, 0.4, engine.provider.__class__.__name__)
@@ -110,7 +110,7 @@ def common_assert(
     completions = [e[0] for e in responses]
 
     assert len(completions) == len(conversations)
-    assert all(completions) == True
+    assert all(completions)
 
     job_cache_dir = f"{CACHE_DIR}/{engine.provider.__class__.__name__}"
 
