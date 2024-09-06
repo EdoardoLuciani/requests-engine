@@ -4,6 +4,7 @@ from typing import Tuple
 
 from ..conversation import Conversation
 
+
 class AbstractProvider(ABC):
     def get_model_id(self) -> str:
         return self.model_id

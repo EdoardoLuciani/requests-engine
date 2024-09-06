@@ -34,9 +34,7 @@ class Engine:
 
             async def task(conversation):
                 async with semaphore:
-                    return await self._get_or_generate_completion(
-                        session, conversation, temperature, task_name
-                    )
+                    return await self._get_or_generate_completion(session, conversation, temperature, task_name)
 
             return await asyncio.gather(*(task(conversation) for conversation in conversations))
 
@@ -79,9 +77,11 @@ class Engine:
         except Exception:
             print(f"Exception occurred: {traceback.print_exc()}")
             return None
-        
+
     def get_cost_from_completions(self, completions: list[Completion]) -> BatchInferenceCost:
-        (input_tokens, output_tokens) = self.provider._get_input_output_tokens_from_completions([e['response'] for e in completions])
+        (input_tokens, output_tokens) = self.provider._get_input_output_tokens_from_completions(
+            [e["response"] for e in completions]
+        )
         cost = ModelPricing.get_cost_from_tokens_count(self.provider.get_model_id(), input_tokens, output_tokens)
         return {
             "input_tokens": input_tokens,

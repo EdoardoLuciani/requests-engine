@@ -82,9 +82,7 @@ def assert_generation_and_response_caching(
 ):
     job_cache_dir = f"{CACHE_DIR}/{engine.provider.__class__.__name__}"
 
-    completions = asyncio.run(
-        engine.schedule_completions(conversation, 0.4, engine.provider.__class__.__name__)
-    )
+    completions = asyncio.run(engine.schedule_completions(conversation, 0.4, engine.provider.__class__.__name__))
     common_assert(engine, conversation, completions)
     assert (
         f"Retrieving completion from cache file {job_cache_dir}" not in capsys.readouterr().out
@@ -93,9 +91,7 @@ def assert_generation_and_response_caching(
     stats = engine.get_cost_from_completions(completions)
     assert all(stats)
 
-    completions = asyncio.run(
-        engine.schedule_completions(conversation, 0.4, engine.provider.__class__.__name__)
-    )
+    completions = asyncio.run(engine.schedule_completions(conversation, 0.4, engine.provider.__class__.__name__))
     common_assert(engine, conversation, completions)
     assert (
         f"Retrieving completion from cache file {job_cache_dir}" in capsys.readouterr().out
@@ -107,7 +103,7 @@ def common_assert(
     conversations: list[requests_engine.Conversation],
     completions: list,
 ):
-    responses = [e['response'] for e in completions]
+    responses = [e["response"] for e in completions]
 
     assert len(responses) == len(conversations)
     assert all(responses)
