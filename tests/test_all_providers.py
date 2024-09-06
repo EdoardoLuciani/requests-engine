@@ -90,7 +90,7 @@ def assert_generation_and_response_caching(
         f"Retrieving completion from cache file {job_cache_dir}" not in capsys.readouterr().out
     ), "Generation was retrieved from cache, when it should have not"
 
-    stats = engine.provider.get_cost_from_completions(completions)
+    stats = engine.get_cost_from_completions(completions)
     assert all(stats)
 
     completions = asyncio.run(

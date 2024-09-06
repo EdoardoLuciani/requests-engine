@@ -3,10 +3,21 @@ import aiohttp, pickle, hashlib, os, asyncio, pathlib, traceback
 from typing import Any, TypedDict
 from .providers.abstract_provider import AbstractProvider
 from .conversation import Conversation
+from .model_pricing import ModelPricing
+
 
 class Completion(TypedDict):
     response: Any
     request_hash: str
+
+
+class BatchInferenceCost(TypedDict):
+    input_tokens: int
+    input_tokens_cost: float
+    output_tokens: int
+    output_tokens_cost: float
+    total_tokens: int
+    total_tokens_cost: float
 
 
 class Engine:
@@ -68,6 +79,18 @@ class Engine:
         except Exception:
             print(f"Exception occurred: {traceback.print_exc()}")
             return None
+        
+    def get_cost_from_completions(self, completions: list[Completion]) -> BatchInferenceCost:
+        (input_tokens, output_tokens) = self.provider._get_input_output_tokens_from_completions([e['response'] for e in completions])
+        cost = ModelPricing.get_cost_from_tokens_count(self.provider.get_model_id(), input_tokens, output_tokens)
+        return {
+            "input_tokens": input_tokens,
+            "output_tokens": output_tokens,
+            "total_tokens": input_tokens + output_tokens,
+            "input_cost": cost["input_tokens_cost"],
+            "output_cost": cost["output_tokens_cost"],
+            "total_tokens_cost": cost["input_tokens_cost"] + cost["output_tokens_cost"],
+        }
 
 
 def _save_object_with_hashed_name(file_path, output) -> None:
