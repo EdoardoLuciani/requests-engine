@@ -1,8 +1,12 @@
 import aiohttp, pickle, hashlib, os, asyncio, pathlib, traceback
 
-from typing import Any
+from typing import Any, TypedDict
 from .providers.abstract_provider import AbstractProvider
 from .conversation import Conversation
+
+class Completion(TypedDict):
+    response: Any
+    request_hash: str
 
 
 class Engine:
@@ -13,7 +17,7 @@ class Engine:
 
     async def schedule_completions(
         self, conversations: list[Conversation], temperature: float, task_name: str
-    ) -> list[tuple[Any, str]]:
+    ) -> list[Completion]:
         semaphore = asyncio.Semaphore(self.max_inflight_requests)
         async with aiohttp.ClientSession() as session:
 
@@ -31,7 +35,7 @@ class Engine:
         conversation: Conversation,
         temperature: float,
         task_name: str,
-    ) -> tuple[Any, str]:
+    ) -> Completion:
         request_body = self.provider.get_request_body(conversation, temperature)
         request_body_digest = _get_request_body_digest(request_body)
 
@@ -42,14 +46,14 @@ class Engine:
         if os.path.isfile(file_path):
             with open(file_path, "rb") as infile:
                 print(f"Retrieving completion from cache file {file_path}")
-                return (pickle.load(infile), request_body_digest)
+                return {"response": pickle.load(infile), "request_hash": request_body_digest}
         else:
             output = await self._generate_completion(session, request_body)
             _save_object_with_hashed_name(file_path, output)
             print(f"Completion has been saved as {file_path}")
-            return (output, request_body_digest)
+            return {"response": output, "request_hash": request_body_digest}
 
-    async def _generate_completion(self, session: aiohttp.ClientSession, request_body: str):
+    async def _generate_completion(self, session: aiohttp.ClientSession, request_body: str) -> Any:
         try:
             print(f"Sending request to provider {self.provider.__class__.__name__}")
             async with self.provider._get_completion_request(session, request_body) as response:

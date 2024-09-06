@@ -82,21 +82,21 @@ def assert_generation_and_response_caching(
 ):
     job_cache_dir = f"{CACHE_DIR}/{engine.provider.__class__.__name__}"
 
-    responses = asyncio.run(
+    completions = asyncio.run(
         engine.schedule_completions(conversation, 0.4, engine.provider.__class__.__name__)
     )
-    common_assert(engine, conversation, responses)
+    common_assert(engine, conversation, completions)
     assert (
         f"Retrieving completion from cache file {job_cache_dir}" not in capsys.readouterr().out
     ), "Generation was retrieved from cache, when it should have not"
 
-    stats = engine.provider.get_cost_from_completions(responses)
+    stats = engine.provider.get_cost_from_completions(completions)
     assert all(stats)
 
-    responses = asyncio.run(
+    completions = asyncio.run(
         engine.schedule_completions(conversation, 0.4, engine.provider.__class__.__name__)
     )
-    common_assert(engine, conversation, responses)
+    common_assert(engine, conversation, completions)
     assert (
         f"Retrieving completion from cache file {job_cache_dir}" in capsys.readouterr().out
     ), "Generation was not retrieved from cache"
@@ -105,12 +105,12 @@ def assert_generation_and_response_caching(
 def common_assert(
     engine: requests_engine.Engine,
     conversations: list[requests_engine.Conversation],
-    responses: list,
+    completions: list,
 ):
-    completions = [e[0] for e in responses]
+    responses = [e['response'] for e in completions]
 
-    assert len(completions) == len(conversations)
-    assert all(completions)
+    assert len(responses) == len(conversations)
+    assert all(responses)
 
     job_cache_dir = f"{CACHE_DIR}/{engine.provider.__class__.__name__}"
 
@@ -120,4 +120,4 @@ def common_assert(
         with open(file_path, "rb") as f:
             pickle_data[filename] = pickle.load(f)
 
-    unittest.TestCase().assertCountEqual(first=list(pickle_data.values()), second=completions)
+    unittest.TestCase().assertCountEqual(first=list(pickle_data.values()), second=responses)
