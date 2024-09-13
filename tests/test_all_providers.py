@@ -1,4 +1,4 @@
-import pytest, dotenv, shutil, requests_engine, unittest, pickle, asyncio, os, base64
+import pytest, dotenv, shutil, requests_engine, unittest, pickle, asyncio, os, base64, logging
 
 CACHE_DIR = "tests_cache"
 
@@ -66,36 +66,34 @@ def gcp_beta_completions_provider():
 def test_generate_response(
     provider_name,
     conversations: list[requests_engine.Conversation],
-    capsys: pytest.CaptureFixture,
+    caplog: pytest.LogCaptureFixture,
     request,
 ):
     provider = request.getfixturevalue(provider_name)
     engine = requests_engine.Engine(provider, serialization_path=CACHE_DIR)
 
-    assert_generation_and_response_caching(engine, conversations, capsys)
+    assert_generation_and_response_caching(engine, conversations, caplog)
 
 
 def assert_generation_and_response_caching(
     engine: requests_engine.Engine,
     conversation: list[requests_engine.Conversation],
-    capsys: pytest.CaptureFixture,
+    caplog: pytest.LogCaptureFixture
 ):
     job_cache_dir = f"{CACHE_DIR}/{engine.provider.__class__.__name__}"
 
     completions = asyncio.run(engine.schedule_completions(conversation, 0.4, engine.provider.__class__.__name__))
     common_assert(engine, conversation, completions)
-    assert (
-        f"Retrieving completion from cache file {job_cache_dir}" not in capsys.readouterr().out
-    ), "Generation was retrieved from cache, when it should have not"
+    assert (("root", logging.INFO, f"Retrieving completion from cache file {job_cache_dir}") in caplog.record_tuples,
+       "Generation was retrieved from cache, when it should have not")
 
     stats = engine.get_cost_from_completions(completions)
     assert all(stats)
 
     completions = asyncio.run(engine.schedule_completions(conversation, 0.4, engine.provider.__class__.__name__))
     common_assert(engine, conversation, completions)
-    assert (
-        f"Retrieving completion from cache file {job_cache_dir}" in capsys.readouterr().out
-    ), "Generation was not retrieved from cache"
+    assert (("root", logging.INFO, f"Retrieving completion from cache file {job_cache_dir}") in caplog.record_tuples,
+        "Generation was not retrieved from cache")
 
 
 def common_assert(

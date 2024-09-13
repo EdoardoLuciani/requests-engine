@@ -1,4 +1,4 @@
-import aiohttp, pickle, hashlib, os, asyncio, pathlib, traceback
+import aiohttp, pickle, hashlib, os, asyncio, pathlib, traceback, logging
 
 from typing import Any, TypedDict
 from .providers.abstract_provider import AbstractProvider
@@ -54,17 +54,17 @@ class Engine:
 
         if os.path.isfile(file_path):
             with open(file_path, "rb") as infile:
-                print(f"Retrieving completion from cache file {file_path}")
+                logging.info(f"Retrieving completion from cache file {file_path}")
                 return {"response": pickle.load(infile), "request_hash": request_body_digest}
         else:
             output = await self._generate_completion(session, request_body)
             _save_object_with_hashed_name(file_path, output)
-            print(f"Completion has been saved as {file_path}")
+            logging.info(f"Completion has been saved as {file_path}")
             return {"response": output, "request_hash": request_body_digest}
 
     async def _generate_completion(self, session: aiohttp.ClientSession, request_body: str) -> Any:
         try:
-            print(f"Sending request to provider {self.provider.__class__.__name__}")
+            logging.info(f"Sending request to provider {self.provider.__class__.__name__}")
             async with self.provider._get_completion_request(session, request_body) as response:
                 if response.status == 200:
                     return await response.json()
@@ -72,10 +72,10 @@ class Engine:
                     await asyncio.sleep(5)
                     return await self._generate_completion(session, request_body)
                 else:
-                    print(f"Error: {response}")
+                    logging.error(f"Error: {response}")
                     return None
         except Exception:
-            print(f"Exception occurred: {traceback.print_exc()}")
+            logging.error(f"Exception occurred: {traceback.logging.info_exc()}")
             return None
 
     def get_cost_from_completions(self, completions: list[Completion]) -> BatchInferenceCost:
